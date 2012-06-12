@@ -19,6 +19,9 @@ namespace TerraNullius
         public int[,] displayArray = new int[40,50];
 
         private Texture2D grassTile;
+        private Texture2D lPlayer;
+
+        private Vector2 playerPosition = new Vector2(0, 0);
 
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -43,6 +46,9 @@ namespace TerraNullius
         /// </summary>
         protected override void Initialize()
         {
+            playerPosition.X = 0;
+            playerPosition.Y = (37 * 16); 
+
             // TODO: Add your initialization logic here
 
             base.Initialize();
@@ -58,7 +64,7 @@ namespace TerraNullius
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             grassTile = Content.Load<Texture2D>("GrassTile");
-
+            lPlayer = Content.Load<Texture2D>("Player");
             // TODO: use this.Content to load your game content here
         }
 
@@ -78,11 +84,18 @@ namespace TerraNullius
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
+            KeyboardState keyState = Keyboard.GetState();
 
-            // TODO: Add your update logic here
+            if (keyState.IsKeyDown(Keys.D))
+            {
+                playerPosition.X += 2;
+            }
+
+            if (keyState.IsKeyDown(Keys.A))
+            {
+                playerPosition.X -= 2;
+            }
+            // TODO: Add your update logic 
 
             base.Update(gameTime);
         }
@@ -103,6 +116,8 @@ namespace TerraNullius
             {
                 spriteBatch.Draw(grassTile, new Vector2 ((i * 16), (39 * 16)), Color.White);
             }
+
+            spriteBatch.Draw(lPlayer, playerPosition, Color.White);
 
             spriteBatch.End();
 
