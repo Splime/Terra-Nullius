@@ -26,6 +26,19 @@ namespace TerraNullius
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        bool pJustJumped = false;
+        bool pInAir = false;
+        private float pPixelVelocity = -0;
+        private double gameTimeChange;
+        private float floatGameTimeChange;
+
+        private float playerMaxVelocity = 10; //pixels per second
+        private float playerAcceleration = 16; //pixels per second per second
+
+        private PhysicsHelper playerPhysics;
+
+        private KeyboardState oldState;
+
         public main()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -47,7 +60,9 @@ namespace TerraNullius
         protected override void Initialize()
         {
             playerPosition.X = 0;
-            playerPosition.Y = (37 * 16); 
+            playerPosition.Y = (37 * 16);
+
+            playerPhysics = new PhysicsHelper(playerMaxVelocity, playerAcceleration);
 
             // TODO: Add your initialization logic here
 
@@ -85,6 +100,7 @@ namespace TerraNullius
         protected override void Update(GameTime gameTime)
         {
             KeyboardState keyState = Keyboard.GetState();
+            KeyboardState newState = keyState; //for first pressed functions
 
             if (keyState.IsKeyDown(Keys.D))
             {
@@ -95,10 +111,42 @@ namespace TerraNullius
             {
                 playerPosition.X -= 2;
             }
+
+            if (oldState.IsKeyUp(Keys.W) && newState.IsKeyDown(Keys.W))
+            {
+                //collision check
+                //if no collision, and on solid ground
+                pPixelVelocity = -20;
+                pInAir = true;
+                pJustJumped = true;
+            }
+
+            if (pInAir == true)
+            {
+                //collision double check
+                //send velocity change(collision) to stop clipping
+                //if pass
+                //ONLY first pass
+                if (pJustJumped == true)
+                {
+                    playerPosition.Y += pPixelVelocity;
+                    pJustJumped = false;
+                }
+                else
+                {
+                    gameTimeChange = gameTime.ElapsedGameTime.TotalMilliseconds;
+                    floatGameTimeChange = (float)gameTimeChange;
+                    pPixelVelocity = playerPhysics.falling(pPixelVelocity, floatGameTimeChange);
+                    playerPosition.Y += pPixelVelocity;
+                }
+            }
             // TODO: Add your update logic 
+
+            oldState = newState; //set oldstate to the state in this update
 
             base.Update(gameTime);
         }
+
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -115,6 +163,10 @@ namespace TerraNullius
             for (int i = 0; i < 50; i++)
             {
                 spriteBatch.Draw(grassTile, new Vector2 ((i * 16), (39 * 16)), Color.White);
+                spriteBatch.Draw(grassTile, new Vector2((20 * 16), (38 * 16)), Color.White);
+                spriteBatch.Draw(grassTile, new Vector2((20 * 16), (37 * 16)), Color.White);
+                spriteBatch.Draw(grassTile, new Vector2((20 * 16), (36 * 16)), Color.White);
+                spriteBatch.Draw(grassTile, new Vector2((20 * 16), (35 * 16)), Color.White);
             }
 
             spriteBatch.Draw(lPlayer, playerPosition, Color.White);
