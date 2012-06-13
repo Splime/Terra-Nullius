@@ -18,7 +18,7 @@ namespace TerraNullius
 
         public float falling(float phVelocity, float deltaT)
         {
-            if (maxVelocity(phVelocity) == phMaxVelocity)
+            if (maxVelocity(phVelocity) >= phMaxVelocity)
             {
                 return phVelocity;
             }

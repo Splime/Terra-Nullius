@@ -32,8 +32,10 @@ namespace TerraNullius
         private double gameTimeChange;
         private float floatGameTimeChange;
 
+        private float pInitialJump = -5;
+
         private float playerMaxVelocity = 10; //pixels per second
-        private float playerAcceleration = 16; //pixels per second per second
+        private float playerAcceleration = 10; //pixels per second per second
 
         private PhysicsHelper playerPhysics;
 
@@ -116,7 +118,7 @@ namespace TerraNullius
             {
                 //collision check
                 //if no collision, and on solid ground
-                pPixelVelocity = -20;
+                pPixelVelocity = pInitialJump;
                 pInAir = true;
                 pJustJumped = true;
             }
@@ -129,11 +131,13 @@ namespace TerraNullius
                 //ONLY first pass
                 if (pJustJumped == true)
                 {
+                    //send velocity change(collision) to stop clipping
                     playerPosition.Y += pPixelVelocity;
                     pJustJumped = false;
                 }
                 else
                 {
+                    //send velocity change(collision) to stop clipping
                     gameTimeChange = gameTime.ElapsedGameTime.TotalMilliseconds;
                     floatGameTimeChange = (float)gameTimeChange;
                     pPixelVelocity = playerPhysics.falling(pPixelVelocity, floatGameTimeChange);
